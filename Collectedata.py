@@ -1,4 +1,5 @@
 import sys
+from time import tzname
 import ogl_viewer.tracking_viewer as gl
 import cv2
 import numpy as np
@@ -6,15 +7,34 @@ import pyzed.sl as sl
 
 def trans_coord_sys_ros_2_opengl( _ros_frame ):
     # Interval Transform Matrix between ROS frame and OpenGL frame
-    t_matrix = np.matrix([[0,0,1,0],
+    _matrix_t = np.matrix([[0,0,1,0],
                            [1,0,0,0],
                            [0,1,0,0],
                            [0,0,0,1]])
-    _opengl_frame = np.dot(_ros_frame , t_matrix)
-    tx = round(_opengl_frame[0,3],3)
-    ty = round(_opengl_frame[1,3],3)
-    tz = round(_opengl_frame[2,3],3)
-    return str((tx, ty, tz))
+    _opengl_frame = np.zeros((4,4))
+    
+    print(_ros_frame.m())
+    
+    #_opengl_frame = np.dot(_ros_frame.m() , _matrix_t)
+    #print(_opengl_frame)
+    
+    # Get translation (OpenGl frame)
+    # tx = round(_opengl_frame[0,3],3)
+    # ty = round(_opengl_frame[1,3],3)
+    # tz = round(_opengl_frame[2,3],3)
+    
+    # # Get 3x3 Rotation Matrix
+    # _matrix_rotation = np.matrix(_opengl_frame[0:2,0],
+    #                              _opengl_frame[0:2,1],
+    #                              _opengl_frame[0:2,2])
+    
+    # # Use Rodrigues rotation formula to get raotaion vector (OpenGL frame)
+    # theta = np.arccos(0.5 * (np.trace(_matrix_rotation) - 1))
+    # rotation_vector = 0.5 / np.sin(theta) * (_matrix_rotation - _matrix_rotation.transpose())
+    # rx = round(rotation_vector[2,1],3)
+    # ry = round(rotation_vector[0,2],3)
+    # rz = round(rotation_vector[1,0],3)
+    # return _opengl_frame , str(( tx, ty, tz )) , str(( rx , ry , rz ))
     
 
 if __name__ == '__main__':
@@ -53,6 +73,7 @@ if __name__ == '__main__':
     camera_info = zed.get_camera_information()
     viewer = gl.GLViewer()
     viewer.init(camera_info.camera_model)
+    opengl_trans = np.zeros((4,4))
     text_translation = ""
     text_rotation = ""
     print("Viewer start!")
@@ -89,16 +110,10 @@ if __name__ == '__main__':
                 qz = round(Quaternion.get()[2],3)
                 qw = round(Quaternion.get()[3],3)
                 
-                # Get rotation vector (ROS frame)
-                rotation = pose.get_rotation_vector()
-                r1 = round(rotation[0], 0)
-                r2 = round(rotation[0], 1)
-                r3 = round(rotation[0], 2)
-                
                 # text
-                Transform * 
-                text_translation = str((tx, ty, tz))
-                text_rotation = str((r1,r2,r3))
+                trans_coord_sys_ros_2_opengl(Transform)
+                #[opengl_trans , text_translation , text_rotation] = trans_coord_sys_ros_2_opengl(Transform)
+
                 
             viewer.updateData(Transform , text_translation , text_rotation ,  pose_status)
                  
