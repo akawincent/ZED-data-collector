@@ -8,9 +8,9 @@ import pyzed.sl as sl
 def trans_coord_sys_ros_2_opengl( InputTransformObeject ):
     # Interval Transform Matrix between ROS frame and OpenGL frame
     interval_rotation_matrix = np.matrix([
-        [0,0,1,],
-        [1,0,0,],
-        [0,1,0,],
+        [ 0 , 0 , 1 ],
+        [ 1 , 0 , 0 ],
+        [ 0 , 1 , 0 ],
     ])
     
     # Get R and t in ROS coordinate system
@@ -19,32 +19,29 @@ def trans_coord_sys_ros_2_opengl( InputTransformObeject ):
     
     # Calculate R and t in OpenGl coordinate system
     opengl_frame_rotation = np.dot( ros_frame_rotation , interval_rotation_matrix )
-    opengl_frame_translation = np.dot( ros_frame_translation , interval_rotation_matrix ) 
+    opengl_frame_translation = np.dot( ros_frame_translation , interval_rotation_matrix) 
     
     # Get translation in OpenGl coordinate system
-    tx = np.round( opengl_frame_translation[0,0] , 2)
-    ty = np.round( opengl_frame_translation[0,1] , 2)
-    tz = np.round( opengl_frame_translation[0,2] , 2)
-    
+    tx = opengl_frame_translation[0,0]
+    ty = opengl_frame_translation[0,1]
+    tz = opengl_frame_translation[0,2]
+
     # Create Transform Object in OpenGl coordinate system as function return
     OutputTransformObeject = sl.Transform() 
     OutputRotationObeject = sl.Rotation()
     OutputTranslationObeject = sl.Translation()
-    
     OutputMatrix3fObeject = sl.Matrix3f()
-    OutputMatrix3fObeject.r[0:8] = opengl_frame_rotation
+
+    #OutputMatrix3fObeject.r = [opengl_frame_rotation[0,0],opengl_frame_rotation[0,1],opengl_frame_rotation[0,2],\
+    #                           opengl_frame_rotation[1,0],opengl_frame_rotation[1,1],opengl_frame_rotation[1,2],\
+    #                           opengl_frame_rotation[2,0],opengl_frame_rotation[2,1],opengl_frame_rotation[2,2]]
+    
     OutputRotationObeject.init_matrix( OutputMatrix3fObeject )
     OutputTranslationObeject.init_vector( tx , ty , tz )
     OutputTransformObeject.init_rotation_translation( OutputRotationObeject , OutputTranslationObeject )
     
-    # Get rotation vector in OpenGl coordinate system
-    opengl_frame_rotation_vector = OutputTransformObeject.get_rotation_vector()
-    rx = round( opengl_frame_rotation_vector[0] , 2 )
-    ry = round( opengl_frame_rotation_vector[1] , 2 )
-    rz = round( opengl_frame_rotation_vector[2] , 2 )
-
     # return output
-    return OutputTransformObeject , str(( tz, tx, ty )) , str(( rx , ry , rz ))
+    return OutputTransformObeject 
     
 
 if __name__ == '__main__':
@@ -109,19 +106,27 @@ if __name__ == '__main__':
             
                 # Get Translation (ROS frame)
                 Tranlation = pose.get_translation(sl.Translation())
-                tx = round(Tranlation.get()[0],3)
-                ty = round(Tranlation.get()[1],3)
-                tz = round(Tranlation.get()[2],3)
+                tx = Tranlation.get()[0]
+                ty = Tranlation.get()[1]
+                tz = Tranlation.get()[2]
                 
                 # Get quaternion express orientation (ROS frame)
                 Quaternion = pose.get_orientation(sl.Orientation())
-                qx = round(Quaternion.get()[0],3)
-                qy = round(Quaternion.get()[1],3)
-                qz = round(Quaternion.get()[2],3)
-                qw = round(Quaternion.get()[3],3)
+                qx = Quaternion.get()[0]
+                qy = Quaternion.get()[1]
+                qz = Quaternion.get()[2]
+                qw = Quaternion.get()[3]
+                
+                # Get rotation vector express orientation (ROS frame)
+                rx = Transform.get_rotation_vector()[0]
+                ry = Transform.get_rotation_vector()[1]
+                rz = Transform.get_rotation_vector()[2]
                 
                 # prepare for OpenGl viewr
-                [OpenGLTransform , text_translation , text_rotation] = trans_coord_sys_ros_2_opengl(Transform)
+                OpenGLTransform = trans_coord_sys_ros_2_opengl(Transform)
+                text_translation = str(( round(tx,3) , round(ty,3) , round(tz,3) ))
+                text_rotation = str(( round(rx,3) , round(ry,3) , round(rz,3) ))
+                
             viewer.updateData(OpenGLTransform , text_translation , text_rotation ,  pose_status)
                  
     ## Quit
