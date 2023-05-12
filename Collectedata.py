@@ -5,36 +5,46 @@ import cv2
 import numpy as np
 import pyzed.sl as sl
 
-def trans_coord_sys_ros_2_opengl( _ros_frame ):
+def trans_coord_sys_ros_2_opengl( InputTransformObeject ):
     # Interval Transform Matrix between ROS frame and OpenGL frame
-    _matrix_t = np.matrix([[0,0,1,0],
-                           [1,0,0,0],
-                           [0,1,0,0],
-                           [0,0,0,1]])
-    _opengl_frame = np.zeros((4,4))
+    interval_rotation_matrix = np.matrix([
+        [0,0,1,],
+        [1,0,0,],
+        [0,1,0,],
+    ])
     
-    print(_ros_frame.m())
+    # Get R and t in ROS coordinate system
+    ros_frame_rotation = InputTransformObeject.get_rotation_matrix().r[0:8].reshape(3,3)
+    ros_frame_translation = InputTransformObeject.get_translation().get().reshape(1,3)
     
-    #_opengl_frame = np.dot(_ros_frame.m() , _matrix_t)
-    #print(_opengl_frame)
+    # Calculate R and t in OpenGl coordinate system
+    opengl_frame_rotation = np.dot( ros_frame_rotation , interval_rotation_matrix )
+    opengl_frame_translation = np.dot( ros_frame_translation , interval_rotation_matrix ) 
     
-    # Get translation (OpenGl frame)
-    # tx = round(_opengl_frame[0,3],3)
-    # ty = round(_opengl_frame[1,3],3)
-    # tz = round(_opengl_frame[2,3],3)
+    # Get translation in OpenGl coordinate system
+    tx = np.round( opengl_frame_translation[0,0] , 2)
+    ty = np.round( opengl_frame_translation[0,1] , 2)
+    tz = np.round( opengl_frame_translation[0,2] , 2)
     
-    # # Get 3x3 Rotation Matrix
-    # _matrix_rotation = np.matrix(_opengl_frame[0:2,0],
-    #                              _opengl_frame[0:2,1],
-    #                              _opengl_frame[0:2,2])
+    # Create Transform Object in OpenGl coordinate system as function return
+    OutputTransformObeject = sl.Transform() 
+    OutputRotationObeject = sl.Rotation()
+    OutputTranslationObeject = sl.Translation()
     
-    # # Use Rodrigues rotation formula to get raotaion vector (OpenGL frame)
-    # theta = np.arccos(0.5 * (np.trace(_matrix_rotation) - 1))
-    # rotation_vector = 0.5 / np.sin(theta) * (_matrix_rotation - _matrix_rotation.transpose())
-    # rx = round(rotation_vector[2,1],3)
-    # ry = round(rotation_vector[0,2],3)
-    # rz = round(rotation_vector[1,0],3)
-    # return _opengl_frame , str(( tx, ty, tz )) , str(( rx , ry , rz ))
+    OutputMatrix3fObeject = sl.Matrix3f()
+    OutputMatrix3fObeject.r[0:8] = opengl_frame_rotation
+    OutputRotationObeject.init_matrix( OutputMatrix3fObeject )
+    OutputTranslationObeject.init_vector( tx , ty , tz )
+    OutputTransformObeject.init_rotation_translation( OutputRotationObeject , OutputTranslationObeject )
+    
+    # Get rotation vector in OpenGl coordinate system
+    opengl_frame_rotation_vector = OutputTransformObeject.get_rotation_vector()
+    rx = round( opengl_frame_rotation_vector[0] , 2 )
+    ry = round( opengl_frame_rotation_vector[1] , 2 )
+    rz = round( opengl_frame_rotation_vector[2] , 2 )
+
+    # return output
+    return OutputTransformObeject , str(( tz, tx, ty )) , str(( rx , ry , rz ))
     
 
 if __name__ == '__main__':
@@ -73,7 +83,7 @@ if __name__ == '__main__':
     camera_info = zed.get_camera_information()
     viewer = gl.GLViewer()
     viewer.init(camera_info.camera_model)
-    opengl_trans = np.zeros((4,4))
+    OpenGLTransform = sl.Transform() 
     text_translation = ""
     text_rotation = ""
     print("Viewer start!")
@@ -110,12 +120,9 @@ if __name__ == '__main__':
                 qz = round(Quaternion.get()[2],3)
                 qw = round(Quaternion.get()[3],3)
                 
-                # text
-                trans_coord_sys_ros_2_opengl(Transform)
-                #[opengl_trans , text_translation , text_rotation] = trans_coord_sys_ros_2_opengl(Transform)
-
-                
-            viewer.updateData(Transform , text_translation , text_rotation ,  pose_status)
+                # prepare for OpenGl viewr
+                [OpenGLTransform , text_translation , text_rotation] = trans_coord_sys_ros_2_opengl(Transform)
+            viewer.updateData(OpenGLTransform , text_translation , text_rotation ,  pose_status)
                  
     ## Quit
     viewer.exit()
