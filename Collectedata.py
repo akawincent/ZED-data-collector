@@ -5,6 +5,8 @@ import cv2
 import numpy as np
 import pyzed.sl as sl
 
+
+# Modification of coordinate system
 def trans_coord_sys_ros_2_opengl( InputTransformObeject ):
     # Interval Transform Matrix between ROS frame and OpenGL frame
     interval_rotation_matrix = np.matrix([
@@ -43,12 +45,19 @@ def trans_coord_sys_ros_2_opengl( InputTransformObeject ):
     # return output
     return OutputTransformObeject 
     
+# Dispaly image
+def left_right_image_viewer( left_img , right_img ):
+    left_view = cv2.resize( left_img,( 640,480,) )
+    right_view = cv2.resize( right_img,( 640,480) )
+    img_horizon_stack = np.hstack(( left_view , right_view ))
+    cv2.imshow("left image and right image", img_horizon_stack )
 
 if __name__ == '__main__':
     ## Initialize camera params
     # Coordinate system is ROS frame
     camera_params = sl.InitParameters(
         camera_resolution = sl.RESOLUTION.HD720,
+        camera_fps = 60,
         coordinate_units = sl.UNIT.METER,
         coordinate_system = sl.COORDINATE_SYSTEM.RIGHT_HANDED_Z_UP_X_FWD,
     )
@@ -83,7 +92,7 @@ if __name__ == '__main__':
     OpenGLTransform = sl.Transform() 
     text_translation = ""
     text_rotation = ""
-    print("Viewer start!")
+    print("Odometry Viewer start!")
     
     ## Record groundtruth pose,stereoscopic img data
     runtime_params = sl.RuntimeParameters()
@@ -91,9 +100,24 @@ if __name__ == '__main__':
     Transform = sl.Transform()              # Create transform var
     Tranlation = sl.Translation()           # Create translation var
     Quaternion = sl.Orientation()           # Create quaternion var
+    LeftImage = sl.Mat()                    # Create Left image mat
+    RightImage = sl.Mat()                   # Create right image mat
     
     while viewer.is_available():
         if zed.grab(runtime_params) == sl.ERROR_CODE.SUCCESS:
+            
+            # Get left view img and right view img 
+            zed.retrieve_image(LeftImage, sl.VIEW.LEFT)
+            zed.retrieve_image(RightImage, sl.VIEW.RIGHT)
+            left_img = LeftImage.get_data()
+            right_img = RightImage.get_data()
+            
+            # Get timestamp
+            timestamp = zed.get_timestamp(sl.TIME_REFERENCE.IMAGE)
+            
+            # Image viewer
+            left_right_image_viewer( left_img , right_img )
+            
             # Retrieve pose 
             pose_status = zed.get_position(
                 py_pose = pose,
@@ -101,7 +125,7 @@ if __name__ == '__main__':
             )
             if pose_status == sl.POSITIONAL_TRACKING_STATE.OK:
                 
-                #Get 4x4 Matrix of Transform (ROS frame)
+                # Get 4x4 Matrix of Transform (ROS frame)
                 Transform = pose.pose_data(sl.Transform())
             
                 # Get Translation (ROS frame)
@@ -122,7 +146,9 @@ if __name__ == '__main__':
                 ry = Transform.get_rotation_vector()[1]
                 rz = Transform.get_rotation_vector()[2]
                 
-                # prepare for OpenGl viewr
+                print("timestamp: {0} tx: {1}, ty:  {2}, tz:  {3}\n".format(timestamp.get_microseconds(), tx, ty, tz))
+                
+                # Prepare for OpenGl viewr
                 OpenGLTransform = trans_coord_sys_ros_2_opengl(Transform)
                 text_translation = str(( round(tx,3) , round(ty,3) , round(tz,3) ))
                 text_rotation = str(( round(rx,3) , round(ry,3) , round(rz,3) ))
