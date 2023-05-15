@@ -71,6 +71,7 @@ if __name__ == '__main__':
             
             # Image viewer
             Tools.left_right_image_viewer( left_img , right_img )
+            Recorder.record_img_data( left_img , right_img, timestamp)
             
             # Retrieve pose 
             pose_status = zed.get_position(
