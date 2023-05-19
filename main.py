@@ -104,7 +104,7 @@ if __name__ == '__main__':
                 # Record data
                 data_wrapper = [timestamp,tx,ty,tz,qx,qy,qz,qw]
                 Recorder.record_pose_data(data_wrapper)
-                #print("timestamp: {0} tx: {1}, ty:  {2}, tz:  {3}\n".format(timestamp, tx, ty, tz))
+                #print("img:{0}   pose:{1}\n".format(timestamp_img,timestamp_pose))
                 
                 # Prepare for OpenGl viewr
                 OpenGLTransform = Tools.trans_coord_sys_ros_2_opengl(Transform)
