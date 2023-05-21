@@ -23,7 +23,17 @@ if __name__ == '__main__':
         print("Fail to open camera!")
         exit(1)
     print("Camera start to work!")
-
+    
+    ## Get calibration parameters of camera
+    calibration_params = zed.get_camera_information().camera_configuration.calibration_parameters
+    baseline = calibration_params.get_camera_baseline()
+    fx = calibration_params.left_cam.fx
+    fy = calibration_params.left_cam.fy
+    cx = calibration_params.left_cam.cx
+    cy = calibration_params.left_cam.cy
+    print("Intrinsic parameters:{0} {1} {2} {3}\n".format(fx,fy,cx,cy))
+    print("Baseline:{0}\n".format(baseline))
+    
     ## Set Tracking params
     track_params = sl.PositionalTrackingParameters(
         _enable_pose_smoothing = True,
@@ -71,7 +81,7 @@ if __name__ == '__main__':
             
             # Image viewer
             Tools.left_right_image_viewer( left_img , right_img )
-            Recorder.record_img_data( left_img , right_img, timestamp)
+            #Recorder.record_img_data( left_img , right_img, timestamp)
             
             # Retrieve pose 
             pose_status = zed.get_position(
@@ -103,7 +113,7 @@ if __name__ == '__main__':
                 
                 # Record data
                 data_wrapper = [timestamp,tx,ty,tz,qx,qy,qz,qw]
-                Recorder.record_pose_data(data_wrapper)
+                #Recorder.record_pose_data(data_wrapper)
                 #print("img:{0}   pose:{1}\n".format(timestamp_img,timestamp_pose))
                 
                 # Prepare for OpenGl viewr
