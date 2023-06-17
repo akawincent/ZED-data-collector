@@ -1,12 +1,38 @@
 import sys
+import os
+import glob
+import time
 import ogl_viewer.tracking_viewer as gl
 import cv2
 import numpy as np
 import pyzed.sl as sl
 from record import Recorder
 from utils import Tools
-   
+
 if __name__ == '__main__':
+    # Clear file generated before
+    if( os.path.isfile("groundtruth.tum")):
+        os.remove('groundtruth.tum')
+        print("Groundtruth file Deleted successfully")
+    else:
+        print("File does not exist")
+        
+    for image_file in glob.glob("images/image_0/*"):
+        if(image_file.__len__() != 0):
+            os.remove(image_file)
+            print("delete"+str(image_file))
+        else:
+            print("image_0 is Already empty")
+            
+    for image_file in glob.glob("images/image_1/*"):
+        if(image_file.__len__() != 0):
+            os.remove(image_file)
+            print("delete"+str(image_file))
+        else:
+            print("image_1 is Already empty")
+            
+    
+
     ## Initialize camera params
     # Coordinate system is ROS frame
     camera_params = sl.InitParameters(
@@ -81,7 +107,7 @@ if __name__ == '__main__':
             
             # Image viewer
             Tools.left_right_image_viewer( left_img , right_img )
-            #Recorder.record_img_data( left_img , right_img, timestamp)
+            Recorder.record_img_data( left_img , right_img, timestamp)
             
             # Retrieve pose 
             pose_status = zed.get_position(
@@ -113,8 +139,7 @@ if __name__ == '__main__':
                 
                 # Record data
                 data_wrapper = [timestamp,tx,ty,tz,qx,qy,qz,qw]
-                #Recorder.record_pose_data(data_wrapper)
-                #print("img:{0}   pose:{1}\n".format(timestamp_img,timestamp_pose))
+                Recorder.record_pose_data(data_wrapper)
                 
                 # Prepare for OpenGl viewr
                 OpenGLTransform = Tools.trans_coord_sys_ros_2_opengl(Transform)

@@ -8,7 +8,7 @@ class Recorder:
         timestamp = data[0]
         [tx,ty,tz] = data[1:4:1]
         [qx,qy,qz,qw] = data[4:8:1]
-        with open('test.txt','a') as file_handle:
+        with open('groundtruth.tum','a') as file_handle:
             file_handle.write("{0} {1} {2} {3} {4} {5} {6} {7}\n".format(timestamp,
                                                                      tx,
                                                                      ty,
@@ -21,9 +21,9 @@ class Recorder:
             
     # Save image
     def record_img_data( LeftImg , RightImg , Timestamp ):
-        left_view = cv2.resize( LeftImg ,( 480 , 360 ) )
-        right_view = cv2.resize( RightImg ,( 480 , 360 ) )
-        left_img_save_path = os.path.join("./images/cam0","{0}.png".format(Timestamp))
-        right_img_save_path = os.path.join("./images/cam1","{0}.png".format(Timestamp))
+        left_view = cv2.resize( LeftImg ,( 640 , 480 ) )
+        right_view = cv2.resize( RightImg ,( 640 , 480 ) )
+        left_img_save_path = os.path.join("./images/image_0","{0}.jpg".format(Timestamp))
+        right_img_save_path = os.path.join("./images/image_1","{0}.jpg".format(Timestamp))
         cv2.imwrite( left_img_save_path , left_view)
         cv2.imwrite( right_img_save_path , right_view)
