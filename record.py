@@ -19,6 +19,11 @@ class Recorder:
                                                                      qw))
             file_handle.close()
             
+    def record_timestamp(timestamp):
+        with open('times.txt','a') as file_handle:
+            file_handle.write("{0}\n".format(round(timestamp*1e-6,6)))
+            file_handle.close()       
+            
     # Save image
     def record_img_data( LeftImg , RightImg , Timestamp ):
         left_view = LeftImg
