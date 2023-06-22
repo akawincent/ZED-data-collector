@@ -38,7 +38,7 @@ if __name__ == '__main__':
             print("image_1 is Already empty")
             
     
-
+    print("hhh")
     ## Initialize camera params
     # Coordinate system is ROS frame
     camera_params = sl.InitParameters(
