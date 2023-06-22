@@ -15,7 +15,13 @@ if __name__ == '__main__':
         os.remove('groundtruth.tum')
         print("Groundtruth file Deleted successfully")
     else:
-        print("File does not exist")
+        print("Groundtruth File does not exist")
+    
+    if( os.path.isfile("times.txt")):
+        os.remove('times.txt')
+        print("Timestamp file Deleted successfully")
+    else:
+        print("Timestamp File does not exist")
         
     for image_file in glob.glob("images/image_0/*"):
         if(image_file.__len__() != 0):
@@ -107,7 +113,6 @@ if __name__ == '__main__':
             
             # Image viewer
             Tools.left_right_image_viewer( left_img , right_img )
-            Recorder.record_img_data( left_img , right_img, timestamp)
             
             # Retrieve pose 
             pose_status = zed.get_position(
@@ -141,6 +146,7 @@ if __name__ == '__main__':
                 data_wrapper = [timestamp,tx,ty,tz,qx,qy,qz,qw]
                 Recorder.record_pose_data(data_wrapper)
                 Recorder.record_timestamp(timestamp)
+                Recorder.record_img_data( left_img , right_img, timestamp)
                 
                 # Prepare for OpenGl viewr
                 OpenGLTransform = Tools.trans_coord_sys_ros_2_opengl(Transform)

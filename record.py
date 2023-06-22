@@ -21,7 +21,10 @@ class Recorder:
             
     def record_timestamp(timestamp):
         with open('times.txt','a') as file_handle:
-            file_handle.write("{0}\n".format(round(timestamp*1e-6,6)))
+            timestamp = str(round(timestamp * 1e-6,6))
+            if(timestamp.__len__() == 16):
+                timestamp = timestamp + str('0')
+            file_handle.write("{0}\n".format(timestamp))
             file_handle.close()       
             
     # Save image
