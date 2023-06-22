@@ -140,6 +140,7 @@ if __name__ == '__main__':
                 # Record data
                 data_wrapper = [timestamp,tx,ty,tz,qx,qy,qz,qw]
                 Recorder.record_pose_data(data_wrapper)
+                Recorder.record_timestamp(timestamp)
                 
                 # Prepare for OpenGl viewr
                 OpenGLTransform = Tools.trans_coord_sys_ros_2_opengl(Transform)
