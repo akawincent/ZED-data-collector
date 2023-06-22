@@ -21,8 +21,8 @@ class Recorder:
             
     # Save image
     def record_img_data( LeftImg , RightImg , Timestamp ):
-        left_view = cv2.resize( LeftImg ,( 640 , 480 ) )
-        right_view = cv2.resize( RightImg ,( 640 , 480 ) )
+        left_view = LeftImg
+        right_view = RightImg
         left_img_save_path = os.path.join("./images/image_0","{0}.jpg".format(Timestamp))
         right_img_save_path = os.path.join("./images/image_1","{0}.jpg".format(Timestamp))
         cv2.imwrite( left_img_save_path , left_view)
