@@ -1,4 +1,3 @@
-from email.mime import image
 import sys
 import pyzed.sl as sl
 import cv2
