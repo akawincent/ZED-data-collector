@@ -2,43 +2,42 @@ import sys
 import os
 import glob
 import time
-import ogl_viewer.tracking_viewer as gl
+import path
 import cv2
 import numpy as np
 import pyzed.sl as sl
+import ogl_viewer.tracking_viewer as gl
 from record import Recorder
 from utils import Tools
 
 if __name__ == '__main__':
-    # Clear file generated before
-    if( os.path.isfile("groundtruth.tum")):
-        os.remove('groundtruth.tum')
-        print("Groundtruth file Deleted successfully")
+    ## Clear file generated before
+    if( os.path.isfile( path.gt_file_path ) ):
+        os.remove( path.gt_file_path )
+        print( "Groundtruth file Deleted successfully" )
     else:
-        print("Groundtruth File does not exist")
+        print( "Groundtruth File does not exist" )
     
-    if( os.path.isfile("times.txt")):
-        os.remove('times.txt')
-        print("Timestamp file Deleted successfully")
+    if( os.path.isfile( path.times_file_path ) ):
+        os.remove( path.times_file_path )
+        print( "Timestamp file Deleted successfully" )
     else:
-        print("Timestamp File does not exist")
-        
-    for image_file in glob.glob("images/image_0/*"):
+        print( "Timestamp File does not exist" )
+
+    for image_file in glob.glob( path.image0_file_path + '*' ):
         if(image_file.__len__() != 0):
             os.remove(image_file)
             print("delete"+str(image_file))
         else:
             print("image_0 is Already empty")
             
-    for image_file in glob.glob("images/image_1/*"):
+    for image_file in glob.glob( path.image1_file_path + '*' ):
         if(image_file.__len__() != 0):
             os.remove(image_file)
             print("delete"+str(image_file))
         else:
             print("image_1 is Already empty")
             
-    
-
     ## Initialize camera params
     # Coordinate system is ROS frame
     camera_params = sl.InitParameters(
