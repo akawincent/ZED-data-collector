@@ -24,19 +24,19 @@ def record_camera_intrinsic_parameters( data ):
     
 if __name__ == "__main__":
     
-    # Check command
+    ## Check command
     if not sys.argv or len(sys.argv) != 2:
         print("Only the path of the output SVO file should be passed as argument.")
         exit(1)
     
-    # Clear file generated before
+    ## Clear file generated before
     if(os.path.isfile("calib_stereo.txt")):
         os.remove('calib_stereo.txt')
         print("Calib file deleted successfully")
     else:
         print("Calib file does not exist")
     
-    # Initialize camera
+    ## Initialize camera
     camera_params = sl.InitParameters(
         camera_resolution = sl.RESOLUTION.HD720,
         camera_fps = 60,
@@ -45,14 +45,14 @@ if __name__ == "__main__":
         coordinate_system = sl.COORDINATE_SYSTEM.RIGHT_HANDED_Z_UP_X_FWD,
     )
     
-    # Open Camera
+    ## Open Camera
     zed = sl.Camera()
     camera_status = zed.open(camera_params)
     if camera_status != sl.ERROR_CODE.SUCCESS:
         print("Fail to open camera")
         exit(1)
     
-    # Get calibration parameters of camera
+    ## Get calibration parameters of camera
     calibration_params = zed.get_camera_information().camera_configuration.calibration_parameters
     baseline = calibration_params.get_camera_baseline()
     fx = calibration_params.left_cam.fx
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     wrap = [fx,fy,cx,cy,w,h,baseline]
     record_camera_intrinsic_parameters(wrap)
     
-    # Set recording parameters
+    ## Set recording parameters
     video_output = sys.argv[1]
     recording_param = sl.RecordingParameters(
         video_filename = video_output, 
@@ -77,7 +77,7 @@ if __name__ == "__main__":
         print("Fail to record video")
         exit(1)
         
-    # Record SVO video
+    ## Record SVO video
     runtime = sl.RuntimeParameters()
     print("SVO is Recording")
     print("Use Ctrl-C to stop recording")
