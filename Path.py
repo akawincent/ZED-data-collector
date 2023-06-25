@@ -1,0 +1,5 @@
+gt_file_path = ".\\data\\groundtruth.tum"
+calib_file_path = ".\\data\\calib_stereo.txt"
+times_file_path = ".\\data\\times.txt"
+image0_file_path = ".\\data\\images\\image_0\\"
+image1_file_path = ".\\data\\images\\image_1\\"
