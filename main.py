@@ -23,6 +23,12 @@ if __name__ == '__main__':
         print( "Timestamp file Deleted successfully" )
     else:
         print( "Timestamp File does not exist" )
+        
+    if(os.path.isfile(path.calib_file_path)):
+        os.remove(path.calib_file_path)
+        print("Calib file deleted successfully")
+    else:
+        print("Calib file does not exist")
 
     for image_file in glob.glob( path.image0_file_path + '*' ):
         if(image_file.__len__() != 0):
@@ -62,6 +68,11 @@ if __name__ == '__main__':
     fy = calibration_params.left_cam.fy
     cx = calibration_params.left_cam.cx
     cy = calibration_params.left_cam.cy
+    image_size = zed.get_camera_information().camera_resolution
+    w = image_size.width
+    h = image_size.height
+    wrap = [fx,fy,cx,cy,w,h,baseline]
+    Recorder.record_camera_intrinsic_parameters(wrap)
     print("Intrinsic parameters:{0} {1} {2} {3}\n".format(fx,fy,cx,cy))
     print("Baseline:{0}\n".format(baseline))
     

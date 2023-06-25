@@ -34,3 +34,15 @@ class Recorder:
         right_img_save_path = os.path.join( path.image1_file_path ,"{0}.jpg".format(Timestamp))
         cv2.imwrite( left_img_save_path , left_view)
         cv2.imwrite( right_img_save_path , right_view)
+        
+    def record_camera_intrinsic_parameters( data ):
+        [fx,fy,cx,cy] = data[0:4:1]
+        [w,h] = data[4:6:1]
+        baseline = data[6]
+        with open(path.calib_file_path,'a') as file_handle:
+            file_handle.write("Pinhole {0} {1} {2} {3} {4}\n".format(fx,fy,cx,cy,0))
+            file_handle.write("{0} {1}\n".format(w,h))
+            file_handle.write("crop\n")
+            file_handle.write("{0} {1}\n".format(w,h))
+            file_handle.write("{0}\n".format(baseline))
+            file_handle.close()
