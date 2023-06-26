@@ -1,6 +1,6 @@
 import sys
 import os
-import Path
+import path
 import pyzed.sl as sl
 from signal import signal, SIGINT
 
@@ -15,7 +15,7 @@ def record_camera_intrinsic_parameters( data ):
     [fx,fy,cx,cy] = data[0:4:1]
     [w,h] = data[4:6:1]
     baseline = data[6]
-    with open(Path.calib_file_path,'a') as file_handle:
+    with open(path.calib_file_path,'a') as file_handle:
         file_handle.write("Pinhole {0} {1} {2} {3} {4}\n".format(fx,fy,cx,cy,0))
         file_handle.write("{0} {1}\n".format(w,h))
         file_handle.write("crop\n")
@@ -31,8 +31,8 @@ if __name__ == "__main__":
         exit(1)
     
     ## Clear file generated before
-    if(os.path.isfile(Path.calib_file_path)):
-        os.remove(Path.calib_file_path)
+    if(os.path.isfile(path.calib_file_path)):
+        os.remove(path.calib_file_path)
         print("Calib file deleted successfully")
     else:
         print("Calib file does not exist")
