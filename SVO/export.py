@@ -8,14 +8,12 @@ import numpy as np
 import pyzed.sl as sl
 from pathlib import Path
 
-
 def progress_bar(percent_done, bar_length=50):
     done_length = int(bar_length * percent_done / 100)
     bar = '=' * done_length + '-' * (bar_length - done_length)
     sys.stdout.write('[%s] %f%s\r' % (bar, percent_done, '%'))
     sys.stdout.flush()
 
-    # Save image
 def record_img_data( LeftImg , RightImg , Timestamp ):
     left_view = LeftImg
     right_view = RightImg
@@ -116,6 +114,6 @@ if __name__ == "__main__":
             if svo_position >= (nb_frames - 1):  # End of SVO
                 sys.stdout.write("\nSVO end has been reached. Exiting now.\n")
                 break
-            
+    ## Close camera    
     zed.close()
     print("Camera stop")
