@@ -3,16 +3,33 @@ import os
 import cv2
 import path
 import glob
+import path
 import numpy as np
 import pyzed.sl as sl
 from pathlib import Path
+
 
 def progress_bar(percent_done, bar_length=50):
     done_length = int(bar_length * percent_done / 100)
     bar = '=' * done_length + '-' * (bar_length - done_length)
     sys.stdout.write('[%s] %f%s\r' % (bar, percent_done, '%'))
     sys.stdout.flush()
-    
+
+    # Save image
+def record_img_data( LeftImg , RightImg , Timestamp ):
+    left_view = LeftImg
+    right_view = RightImg
+    left_img_save_path = os.path.join( path.image0_file_path ,"{0}.png".format(Timestamp))
+    right_img_save_path = os.path.join( path.image1_file_path ,"{0}.png".format(Timestamp))
+    cv2.imwrite( left_img_save_path , left_view)
+    cv2.imwrite( right_img_save_path , right_view)
+
+def record_timestamp( data ):
+    timestamp = data 
+    with open('times.txt','a') as file_handle:
+        file_handle.write("{:.6f}\n".format(timestamp*0.000001))                     
+        file_handle.close()
+
 if __name__ == "__main__":
     ## Clear file generated before
     if( os.path.isfile(path.times_file_path)):
@@ -74,5 +91,31 @@ if __name__ == "__main__":
     LeftImage = sl.Mat()                    # Create Left image mat
     RightImage = sl.Mat()                   # Create right image mat
     
-    ## 
-    #runtime_params = sl.RuntimeParameters()
+    ## Export data
+    runtime_params = sl.RuntimeParameters()
+    sys.stdout.write("Converting SVO... Use Ctrl-C to interrupt conversion.\n")
+    nb_frames = zed.get_svo_number_of_frames()      # Get total frames number
+    
+    while True:
+        if zed.grab(runtime_params) == sl.ERROR_CODE.SUCCESS:
+            svo_position = zed.get_svo_position()   # Get current frame id 
+            
+            # Retrieve stereo images and timestamp
+            zed.retrieve_image(LeftImage, sl.VIEW.LEFT)
+            zed.retrieve_image(RightImage, sl.VIEW.RIGHT)
+            left_img = LeftImage.get_data()
+            right_img = RightImage.get_data()            
+            timestamp = zed.get_timestamp(sl.TIME_REFERENCE.IMAGE).get_microseconds()
+            record_img_data(left_img , right_img , timestamp)
+            record_timestamp(timestamp)
+            
+            # Display progress
+            progress_bar((svo_position + 1) / nb_frames * 100, 30)
+            
+            # Check if we have reached the end of the video
+            if svo_position >= (nb_frames - 1):  # End of SVO
+                sys.stdout.write("\nSVO end has been reached. Exiting now.\n")
+                break
+            
+    zed.close()
+    print("Camera stop")
