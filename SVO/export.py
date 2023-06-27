@@ -51,5 +51,28 @@ if __name__ == "__main__":
         exit(1)
     print("Camera start to work offline!") 
     
-    ## 
+    ## Set Tracking params
+    track_params = sl.PositionalTrackingParameters(
+        _enable_pose_smoothing = True,
+        _enable_imu_fusion = True,
+        _set_floor_as_origin = False,
+        _set_gravity_as_origin = True,
+        _set_as_static = False,
+        _depth_min_range = 10.0,
+    )
+    track_status = zed.enable_positional_tracking(track_params)
+    if track_status != sl.ERROR_CODE.SUCCESS:
+        print("Fail to enable tracking!")
+        exit(1)
+    print("Successfully enable tracking function!")
     
+    ## Create series variables
+    pose = sl.Pose()                        # Create pose var
+    Transform = sl.Transform()              # Create transform var
+    Tranlation = sl.Translation()           # Create translation var
+    Quaternion = sl.Orientation()           # Create quaternion var
+    LeftImage = sl.Mat()                    # Create Left image mat
+    RightImage = sl.Mat()                   # Create right image mat
+    
+    ## 
+    #runtime_params = sl.RuntimeParameters()
