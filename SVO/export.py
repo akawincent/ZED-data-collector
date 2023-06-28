@@ -21,6 +21,21 @@ def record_img_data( LeftImg , RightImg , Timestamp ):
     right_img_save_path = os.path.join( path.image1_file_path ,"{0}.png".format(Timestamp))
     cv2.imwrite( left_img_save_path , left_view)
     cv2.imwrite( right_img_save_path , right_view)
+    
+def record_groundtruth_data( data ):
+        timestamp = data[0]
+        [tx,ty,tz] = data[1:4:1]
+        [qx,qy,qz,qw] = data[4:8:1]
+        with open( path.gt_file_path ,'a') as file_handle:
+            file_handle.write("{0} {1} {2} {3} {4} {5} {6} {7}\n".format(timestamp,
+                                                                     tx,
+                                                                     ty,
+                                                                     tz,
+                                                                     qx,
+                                                                     qy,
+                                                                     qz,
+                                                                     qw))
+            file_handle.close()
 
 def record_timestamp( data ):
     timestamp = data 
@@ -106,6 +121,33 @@ if __name__ == "__main__":
             timestamp = zed.get_timestamp(sl.TIME_REFERENCE.IMAGE).get_microseconds()
             record_img_data(left_img , right_img , timestamp)
             record_timestamp(timestamp)
+            
+            # Retrieve pose 
+            pose_status = zed.get_position(
+                py_pose = pose,
+                reference_frame = sl.REFERENCE_FRAME.WORLD,
+            )
+            if pose_status == sl.POSITIONAL_TRACKING_STATE.OK:
+                
+                # Get 4x4 Matrix of Transform (ROS frame)
+                Transform = pose.pose_data(sl.Transform())
+            
+                # Get Translation (ROS frame)
+                Tranlation = pose.get_translation(sl.Translation())
+                tx = Tranlation.get()[0]
+                ty = Tranlation.get()[1]
+                tz = Tranlation.get()[2]
+                
+                # Get quaternion express orientation (ROS frame)
+                Quaternion = pose.get_orientation(sl.Orientation())
+                qx = Quaternion.get()[0]
+                qy = Quaternion.get()[1]
+                qz = Quaternion.get()[2]
+                qw = Quaternion.get()[3]
+                
+                # Record data
+                data_wrapper = [timestamp,tx,ty,tz,qx,qy,qz,qw]
+                record_groundtruth_data(data_wrapper)
             
             # Display progress
             progress_bar((svo_position + 1) / nb_frames * 100, 30)
