@@ -39,7 +39,7 @@ def record_groundtruth_data( data ):
 
 def record_timestamp( data ):
     timestamp = data 
-    with open('times.txt','a') as file_handle:
+    with open(path.times_file_path,'a') as file_handle:
         file_handle.write("{:.6f}\n".format(timestamp*0.000001))                     
         file_handle.close()
 
@@ -69,7 +69,7 @@ if __name__ == "__main__":
         svo_real_time_mode = False,  # Don't convert in realtime
         coordinate_system = sl.COORDINATE_SYSTEM.RIGHT_HANDED_Z_UP_X_FWD,
         coordinate_units = sl.UNIT.METER,
-        depth_mode = sl.DEPTH_MODE.NONE,
+        depth_mode = sl.DEPTH_MODE.PERFORMANCE
     )
     camera_params.set_from_svo_file(str(svo_file_path))
 
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     track_params = sl.PositionalTrackingParameters(
         _enable_pose_smoothing = True,
         _enable_imu_fusion = True,
-        _set_floor_as_origin = False,
+        _set_floor_as_origin = True,
         _set_gravity_as_origin = True,
         _set_as_static = False,
         _depth_min_range = 10.0,
