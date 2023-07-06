@@ -7,6 +7,7 @@ import path
 import numpy as np
 import pyzed.sl as sl
 from pathlib import Path
+import matplotlib.pyplot as plt
 
 def progress_bar(percent_done, bar_length=50):
     done_length = int(bar_length * percent_done / 100)
@@ -91,7 +92,7 @@ if __name__ == "__main__":
         _enable_pose_smoothing = True,
         _enable_imu_fusion = True,
         _set_floor_as_origin = False,
-        _set_gravity_as_origin = False,
+        _set_gravity_as_origin = True,
         _set_as_static = False,
         _depth_min_range = 10.0,
     )
@@ -109,11 +110,14 @@ if __name__ == "__main__":
     LeftImage = sl.Mat()                    # Create Left image mat
     RightImage = sl.Mat()                   # Create right image mat
     
+    tx_list = []
+    ty_list = []
+    tz_list = []
+    
     ## Export data
     runtime_params = sl.RuntimeParameters()
     sys.stdout.write("Converting SVO... Use Ctrl-C to interrupt conversion.\n")
     nb_frames = zed.get_svo_number_of_frames()      # Get total frames number
-    
     while True:
         if zed.grab(runtime_params) == sl.ERROR_CODE.SUCCESS:
             svo_position = zed.get_svo_position()   # Get current frame id 
@@ -124,8 +128,6 @@ if __name__ == "__main__":
             left_img = LeftImage.get_data()
             right_img = RightImage.get_data()            
             timestamp = zed.get_timestamp(sl.TIME_REFERENCE.IMAGE).get_microseconds()
-            record_img_data(left_img , right_img , timestamp)
-            record_timestamp(timestamp)
             
             # Retrieve pose 
             pose_status = zed.get_position(
@@ -150,10 +152,16 @@ if __name__ == "__main__":
                 qz = Quaternion.get()[2]
                 qw = Quaternion.get()[3]
                 
+                tx_list.append(tx)
+                ty_list.append(ty)
+                tz_list.append(tz)
+                
                 # Record data
                 data_wrapper = [timestamp,tx,ty,tz,qx,qy,qz,qw]
                 record_groundtruth_data(data_wrapper)
-            
+                #record_img_data(left_img , right_img , timestamp)
+                record_timestamp(timestamp)
+                
             # Display progress
             progress_bar((svo_position + 1) / nb_frames * 100, 30)
             
@@ -161,6 +169,15 @@ if __name__ == "__main__":
             if svo_position >= (nb_frames - 1):  # End of SVO
                 sys.stdout.write("\nSVO end has been reached. Exiting now.\n")
                 break
+    fig = plt.figure()    
+    ax = fig.gca(projection='3d')  
+    ax.plot(tx_list,ty_list,tz_list) 
+    ax.set_xlim(-50, 50)
+    ax.set_ylim(-50, 50) 
+    ax.set_zlim(-50, 50)
+    ax.legend()
+    plt.grid()         
+    plt.show()
     ## Close camera    
     zed.close()
     print("Camera stop")
