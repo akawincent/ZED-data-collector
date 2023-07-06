@@ -50,13 +50,18 @@ if __name__ == "__main__":
         print("Times file Deleted successfully")
     else:
         print("Times file does not exist")
+    if( os.path.isfile(path.gt_file_path)):
+        os.remove(path.gt_file_path)
+        print("Groundtruth file Deleted successfully")
+    else:
+        print("Groundtruth file does not exist")
     for image_file in glob.glob( path.image0_file_path + '*'):
         if(image_file.__len__() != 0):
             os.remove(image_file)
             print("delete"+str(image_file))
         else:
             print("image_0 is Already empty")
-    for image_file in glob.glob(path.image0_file_path + '*'):
+    for image_file in glob.glob(path.image1_file_path + '*'):
         if(image_file.__len__() != 0):
             os.remove(image_file)
             print("delete"+str(image_file))
@@ -85,8 +90,8 @@ if __name__ == "__main__":
     track_params = sl.PositionalTrackingParameters(
         _enable_pose_smoothing = True,
         _enable_imu_fusion = True,
-        _set_floor_as_origin = True,
-        _set_gravity_as_origin = True,
+        _set_floor_as_origin = False,
+        _set_gravity_as_origin = False,
         _set_as_static = False,
         _depth_min_range = 10.0,
     )
