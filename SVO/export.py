@@ -169,6 +169,7 @@ if __name__ == "__main__":
             if svo_position >= (nb_frames - 1):  # End of SVO
                 sys.stdout.write("\nSVO end has been reached. Exiting now.\n")
                 break
+            
     fig = plt.figure()    
     ax = fig.gca(projection='3d')  
     ax.plot(tx_list,ty_list,tz_list) 

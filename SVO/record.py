@@ -41,7 +41,7 @@ if __name__ == "__main__":
     camera_params = sl.InitParameters(
         camera_resolution = sl.RESOLUTION.HD720,
         camera_fps = 60,
-        depth_mode = sl.DEPTH_MODE.NONE,
+        depth_mode = sl.DEPTH_MODE.PERFORMANCE,
         coordinate_units = sl.UNIT.METER,
         coordinate_system = sl.COORDINATE_SYSTEM.RIGHT_HANDED_Z_UP_X_FWD,
     )
