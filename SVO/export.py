@@ -75,7 +75,7 @@ if __name__ == "__main__":
         svo_real_time_mode = False,  # Don't convert in realtime
         coordinate_system = sl.COORDINATE_SYSTEM.RIGHT_HANDED_Z_UP_X_FWD,
         coordinate_units = sl.UNIT.METER,
-        depth_mode = sl.DEPTH_MODE.PERFORMANCE
+        depth_mode = sl.DEPTH_MODE.ULTRA
     )
     camera_params.set_from_svo_file(str(svo_file_path))
 
@@ -91,10 +91,7 @@ if __name__ == "__main__":
     track_params = sl.PositionalTrackingParameters(
         _enable_pose_smoothing = True,
         _enable_imu_fusion = True,
-        _set_floor_as_origin = False,
-        _set_gravity_as_origin = True,
-        _set_as_static = False,
-        _depth_min_range = 10.0,
+        _mode = sl.POSITIONAL_TRACKING_MODE.QUALITY
     )
     track_status = zed.enable_positional_tracking(track_params)
     if track_status != sl.ERROR_CODE.SUCCESS:
@@ -159,7 +156,7 @@ if __name__ == "__main__":
                 # Record data
                 data_wrapper = [timestamp,tx,ty,tz,qx,qy,qz,qw]
                 record_groundtruth_data(data_wrapper)
-                #record_img_data(left_img , right_img , timestamp)
+                record_img_data(left_img , right_img , timestamp)
                 record_timestamp(timestamp)
                 
             # Display progress
