@@ -40,8 +40,8 @@ if __name__ == "__main__":
     ## Initialize camera
     camera_params = sl.InitParameters(
         camera_resolution = sl.RESOLUTION.HD720,
-        camera_fps = 60,
-        depth_mode = sl.DEPTH_MODE.PERFORMANCE,
+        camera_fps = 30,
+        depth_mode = sl.DEPTH_MODE.ULTRA,
         coordinate_units = sl.UNIT.METER,
         coordinate_system = sl.COORDINATE_SYSTEM.RIGHT_HANDED_Z_UP_X_FWD,
     )
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     recording_param = sl.RecordingParameters(
         video_filename = video_output, 
         compression_mode = sl.SVO_COMPRESSION_MODE.LOSSLESS,
-        target_framerate = 60,
+        target_framerate = 30,
     )
     record_status = zed.enable_recording(recording_param)
     if record_status != sl.ERROR_CODE.SUCCESS:

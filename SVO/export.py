@@ -88,11 +88,7 @@ if __name__ == "__main__":
     print("Camera start to work offline!") 
     
     ## Set Tracking params
-    track_params = sl.PositionalTrackingParameters(
-        _enable_pose_smoothing = True,
-        _enable_imu_fusion = True,
-        _mode = sl.POSITIONAL_TRACKING_MODE.QUALITY
-    )
+    track_params = sl.PositionalTrackingParameters()
     track_status = zed.enable_positional_tracking(track_params)
     if track_status != sl.ERROR_CODE.SUCCESS:
         print("Fail to enable tracking!")
@@ -125,7 +121,7 @@ if __name__ == "__main__":
             left_img = LeftImage.get_data()
             right_img = RightImage.get_data()            
             timestamp = zed.get_timestamp(sl.TIME_REFERENCE.IMAGE).get_microseconds()
-            
+
             # Retrieve pose 
             pose_status = zed.get_position(
                 py_pose = pose,
@@ -158,6 +154,7 @@ if __name__ == "__main__":
                 record_groundtruth_data(data_wrapper)
                 record_img_data(left_img , right_img , timestamp)
                 record_timestamp(timestamp)
+
                 
             # Display progress
             progress_bar((svo_position + 1) / nb_frames * 100, 30)
